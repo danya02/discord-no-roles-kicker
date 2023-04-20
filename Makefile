@@ -1,4 +1,7 @@
-all: build run
+all: clean-local build run
+clean-local:
+	cargo clean
+
 build:
 	docker-compose build
 
