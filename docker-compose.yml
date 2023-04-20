@@ -4,3 +4,5 @@ services:
     build: .
     volumes:
       - ./database.db:/database.db:rw
+    environment:
+      - DATABASE_URL=sqlite:/database.db
