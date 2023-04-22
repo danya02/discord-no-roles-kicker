@@ -1,17 +1,19 @@
 use serenity::async_trait;
 use serenity::model::channel::Message;
 use serenity::model::gateway::Ready;
+use serenity::model::prelude::command::Command;
 use serenity::model::prelude::{ChannelId, Guild, GuildId, Member, UserId};
+use serenity::model::prelude::interaction::Interaction;
 use serenity::prelude::*;
 use sqlx::SqlitePool;
 
-use crate::DatabasePoolHolder;
+use crate::{commands, DatabasePoolHolder};
 
 use tracing::*;
 
 pub struct Handler;
 
-fn snowflake_as_db<T>(flake: T) -> i64
+pub fn snowflake_as_db<T>(flake: T) -> i64
 where
     T: Into<u64>,
 {
@@ -40,6 +42,38 @@ impl EventHandler for Handler {
                 // No rule for this guild.
                 info!("No rule present for guild {}", guild.id);
                 self.greet_new_guild(&ctx, guild.id).await;
+            }
+        }
+
+        // Create global slash commands
+        if let Err(why) = Command::create_global_application_command(&ctx.http, |command| {
+            commands::setup::register(command)
+        })
+        .await
+        {
+            error!("Failed to create global setup command: {why}");
+        }
+    }
+
+    async fn interaction_create(&self, ctx: Context, interaction: Interaction) {
+        if let Interaction::ApplicationCommand(command) = interaction {
+            info!("Received command interaction: {:#?}", command);
+
+            let result = match command.data.name.as_str() {
+                "setup" => commands::setup::run(&ctx, &command).await,
+                other => {
+                    error!("Interaction command not implemented: {other}");
+                    Err("Interaction command not implemented; this is a bug in the bot.".to_owned())
+                }
+            };
+
+            if let Err(why) = result {
+                error!("Error while performing interaction: {why}");
+                if let Err(why2) = command
+                    .create_followup_message(&ctx.http, |resp| resp.content(why))
+                    .await {
+                        error!("Also error responding: {why2}");
+                    }
             }
         }
     }
