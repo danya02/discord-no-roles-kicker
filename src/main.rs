@@ -1,10 +1,17 @@
 mod handler;
 
+use std::path::Path;
+
 use serenity::{framework::StandardFramework, prelude::*};
 use sqlx::SqlitePool;
 
 #[tokio::main]
 async fn main() {
+    // If running inside Docker, do not load dotenv file
+    if std::env::var("NO_PERFORM_LOAD_ENV_FILE").is_err() { // not present -> load
+        dotenvy::from_path(Path::new("CONFIG.env")).expect("Failed to load environment variables from CONFIG.env; set $NO_PERFORM_LOAD_ENV_FILE to disable");
+    }
+
     let pool =
         SqlitePool::connect(&std::env::var("DATABASE_URL").expect("No $DATABASE_URL provided!"))
             .await

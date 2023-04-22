@@ -6,5 +6,6 @@ services:
       - ./database.db:/database.db:rw
     environment:
       - DATABASE_URL=sqlite:/database.db
+      - NO_PERFORM_LOAD_ENV_FILE=1
     env_file:
       - CONFIG.env

@@ -6,6 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+dotenvy = "0.15.7"
 serenity = { version = "0.11.5", features=["cache", "framework", "standard_framework", "rustls_backend"] }
 sqlx = { version = "0.6.3", features=["sqlite", "runtime-tokio-rustls"] }
 tokio = { version = "1.27.0", features = ["full"] }
