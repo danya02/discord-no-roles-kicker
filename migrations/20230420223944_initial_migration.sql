@@ -1,8 +1,8 @@
--- Guild members and when they joined
-CREATE TABLE new_members(
+-- Pending kicks
+CREATE TABLE pending_kicks(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    guild_id INTEGER,
-    user_id INTEGER,
-    joined_at_unix_time INTEGER,
-    is_considered_for_kicking INTEGER  -- boolean
+    guild_id INTEGER NOT NULL,
+    user_id INTEGER NOT NULL,
+    kick_after_unix_time INTEGER,
+    unless_has_role_id INTEGER  -- can be null for unconditional kick
 );
