@@ -7,6 +7,8 @@ use crate::DatabasePoolHolder;
 
 use tracing::*;
 
+use super::CommandResponse;
+
 pub fn register(command: &mut CreateApplicationCommand) -> &mut CreateApplicationCommand {
     command
         .name("setup")
@@ -15,7 +17,10 @@ pub fn register(command: &mut CreateApplicationCommand) -> &mut CreateApplicatio
         .dm_permission(false)
 }
 
-pub async fn run(ctx: &Context, command: &ApplicationCommandInteraction) -> Result<(), String> {
+pub async fn run(
+    ctx: &Context,
+    command: &ApplicationCommandInteraction,
+) -> Result<Option<CommandResponse>, String> {
     let type_map = ctx.data.read().await;
     let pool_holder: &DatabasePoolHolder = type_map.get::<DatabasePoolHolder>().unwrap();
     let pool = pool_holder.as_ref();
@@ -36,14 +41,5 @@ pub async fn run(ctx: &Context, command: &ApplicationCommandInteraction) -> Resu
         return Err(format!("Error while making initial guild rule: {why}"));
     }
 
-    let res = command.create_interaction_response(&ctx.http, |resp|{
-        resp.kind(serenity::model::prelude::interaction::InteractionResponseType::ChannelMessageWithSource)
-        .interaction_response_data(|msg| msg.content("Created basic rule for this server, using this channel for system messages. Use `/rule` to view and edit it."))
-    }).await;
-    if let Err(why) = res {
-        error!("Error while responding to setup interaction: {why}");
-        return Err(format!("Error while responding to interaction: {why}"));
-    }
-
-    Ok(())
+    Ok(CommandResponse::text("Created basic rule for this server, using this channel for system messages. Use `/rule` to view and edit it.".to_owned()))
 }
