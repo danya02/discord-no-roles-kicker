@@ -27,7 +27,11 @@ pub async fn run(ctx: &Context, command: &ApplicationCommandInteraction) -> Resu
             .expect("Received guild-only interaction without guild provided?!"),
     );
 
-    if let Err(why) = sqlx::query!("INSERT INTO guild_rule (guild_id, system_message_channel_id, kick_safety_timeout) VALUES (?, ?, ?)", guild_id, channel_id, 600).execute(pool).await {
+    if let Err(why) = sqlx::query!(
+        "INSERT INTO guild_rule (guild_id, system_message_channel_id, kick_safety_timeout, pending_kick_notification_values) VALUES (?, ?, ?, ?)",
+        guild_id, channel_id, 600,
+        "3600 7200 21600 43200 86400 259200 604800 1209600"
+    ).execute(pool).await {
         error!("Error while making initial guild rule for {guild_id}: {why}");
         return Err(format!("Error while making initial guild rule: {why}"));
     }

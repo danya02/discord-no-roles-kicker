@@ -47,11 +47,13 @@ impl EventHandler for Handler {
 
         // Create global slash commands
         if let Err(why) = Command::create_global_application_command(&ctx.http, |command| {
-            commands::setup::register(command)
+            commands::setup::register(command);
+            commands::show_rule::register(command);
+            command
         })
         .await
         {
-            error!("Failed to create global setup command: {why}");
+            error!("Failed to create global commands: {why}");
         }
     }
 
@@ -61,6 +63,7 @@ impl EventHandler for Handler {
 
             let result = match command.data.name.as_str() {
                 "setup" => commands::setup::run(&ctx, &command).await,
+                "rule" => commands::show_rule::run(&ctx, &command).await,
                 other => {
                     error!("Interaction command not implemented: {other}");
                     Err("Interaction command not implemented; this is a bug in the bot.".to_owned())
@@ -69,9 +72,10 @@ impl EventHandler for Handler {
 
             if let Err(why) = result {
                 error!("Error while performing interaction: {why}");
-                if let Err(why2) = command
-                    .create_followup_message(&ctx.http, |resp| resp.content(why))
-                    .await {
+                if let Err(why2) = command.create_interaction_response(&ctx.http, |resp|{
+                    resp.kind(serenity::model::prelude::interaction::InteractionResponseType::ChannelMessageWithSource)
+                    .interaction_response_data(|msg| msg.content(why))
+                }).await {
                         error!("Also error responding: {why2}");
                     }
             }

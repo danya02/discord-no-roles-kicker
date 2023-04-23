@@ -7,7 +7,7 @@ CREATE TABLE guild_rule (
     loss_of_immunity_role_timeout INTEGER, -- null for no kick on loss of immunity role
     system_message_channel_id INTEGER NOT NULL,
     pending_kick_notification_channel_id INTEGER,
-    pending_kick_notification_values VARCHAR(255),  -- space-separated decimal integers representing seconds before kick arrives
+    pending_kick_notification_values VARCHAR(255) NOT NULL,  -- space-separated decimal integers representing seconds before kick arrives
     kick_safety_timeout INTEGER NOT NULL
 );
 
