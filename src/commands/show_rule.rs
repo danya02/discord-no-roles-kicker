@@ -81,7 +81,7 @@ pub async fn run(
         text.push(format!("Kick immunity role: unset `/immunityrole`"))
     }
 
-    if let Some(t) = rule.new_member_kick_timeout {
+    if let Some(t) = rule.loss_of_immunity_role_timeout {
         let dur = Duration::from_secs(t as u64);
         text.push(format!(
             "Members losing immunity role get kicked after: {} seconds = {} `/immunitytimeout`",

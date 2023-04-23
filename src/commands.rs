@@ -1,10 +1,11 @@
 use serenity::model::application::interaction::application_command::ApplicationCommandInteraction;
 use serenity::{model::prelude::command::Command, prelude::Context};
-use tracing::error;
+use tracing::*;
 
 mod channel;
 mod setup;
 mod show_rule;
+mod timeout;
 
 #[derive(Clone, Debug)]
 pub struct CommandResponse {
@@ -29,15 +30,67 @@ impl CommandResponse {
 }
 
 pub async fn setup_commands(ctx: &Context) {
-    if let Err(why) = Command::create_global_application_command(&ctx.http, |command| {
-        setup::register(command);
-        show_rule::register(command);
-        channel::system_register(command);
-        command
-    })
-    .await
-    {
-        error!("Failed to create global commands: {why}");
+    info!("Starting creation of application commands");
+    let mut results = vec![];
+    results.push(
+        Command::create_global_application_command(&ctx.http, |command| {
+            setup::register(command);
+            command
+        })
+        .await,
+    );
+    results.push(
+        Command::create_global_application_command(&ctx.http, |command| {
+            show_rule::register(command);
+            command
+        })
+        .await,
+    );
+
+    results.push(
+        Command::create_global_application_command(&ctx.http, |command| {
+            channel::system_register(command);
+            command
+        })
+        .await,
+    );
+
+    results.push(
+        Command::create_global_application_command(&ctx.http, |command| {
+            channel::notify_register(command);
+            command
+        })
+        .await,
+    );
+
+    results.push(
+        Command::create_global_application_command(&ctx.http, |command| {
+            timeout::new_register(command);
+            command
+        })
+        .await,
+    );
+
+    results.push(
+        Command::create_global_application_command(&ctx.http, |command| {
+            timeout::immunity_register(command);
+            command
+        })
+        .await,
+    );
+
+    results.push(
+        Command::create_global_application_command(&ctx.http, |command| {
+            timeout::safety_register(command);
+            command
+        })
+        .await,
+    );
+
+    for res in results {
+        if let Err(why) = res {
+            error!("Error while creating command: {why}");
+        }
     }
 }
 
@@ -46,9 +99,16 @@ pub async fn dispatch(ctx: Context, command: ApplicationCommandInteraction) {
         "setup" => setup::run(&ctx, &command).await,
         "rule" => show_rule::run(&ctx, &command).await,
         "syschannel" => channel::system_run(&ctx, &command).await,
+        "pendingchannel" => channel::notify_run(&ctx, &command).await,
+        "newtimeout" => timeout::run(&ctx, &command, timeout::TimeoutType::NewMember).await,
+        "immunitytimeout" => timeout::run(&ctx, &command, timeout::TimeoutType::ImmunityRoleLoss).await,
+        "safetytimeout" => timeout::run(&ctx, &command, timeout::TimeoutType::Safety).await,
+
         other => {
             error!("Interaction command not implemented: {other}");
-            Err("Interaction command not implemented; this is a bug in the bot.".to_owned())
+            Err(format!(
+                "Interaction command for `{other}` is not implemented; this is a bug in the bot."
+            ))
         }
     };
 
