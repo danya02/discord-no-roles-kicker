@@ -1,0 +1,12 @@
+version: "3.9"
+services:
+  discordbot:
+    build: .
+    restart: unless-stopped
+    env_file:
+     - CONFIG.env
+    volumes:
+     - ./database.db:/database.db
+    environment:
+      # Set this to publish application commands quicker
+      - DEV_GUILD=
