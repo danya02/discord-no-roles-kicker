@@ -16,7 +16,7 @@ class MyModel(pw.Model):
 
 @create_table
 class GuildConfig(MyModel):
-    guild_id = pw.BigIntegerField()
+    guild_id = pw.BigIntegerField(unique=True)
     new_member_kick_timeout = pw.IntegerField(null=True)
     immunity_role_id = pw.BigIntegerField(null=True)
     loss_of_immunity_role_timeout = pw.IntegerField(null=True)

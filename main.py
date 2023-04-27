@@ -5,7 +5,9 @@ import database
 import logging
 log = logging.getLogger(__name__)
 
-GUILD = int(os.getenv("DEV_GUILD"))
+import commands
+
+GUILD = int(os.getenv("DEV_GUILD") or 0)
 if GUILD:
     GUILD = discord.Object(GUILD)
 
@@ -17,6 +19,7 @@ class MyClient(discord.Client):
         self.tree = app_commands.CommandTree(self)
 
     async def setup_hook(self):
+        commands.attach(self.tree)
         if GUILD:
             self.tree.copy_global_to(guild=GUILD)
             await self.tree.sync(guild=GUILD)
