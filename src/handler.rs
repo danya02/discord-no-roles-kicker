@@ -1,3 +1,7 @@
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::Arc;
+use std::time::Duration;
+
 use serenity::async_trait;
 use serenity::model::channel::Message;
 use serenity::model::gateway::Ready;
@@ -6,11 +10,15 @@ use serenity::model::prelude::{ChannelId, Guild, GuildId, Member, UserId};
 use serenity::prelude::*;
 use sqlx::SqlitePool;
 
+use crate::kick_manager::KickManager;
 use crate::{commands, DatabasePoolHolder};
 
 use tracing::*;
 
-pub struct Handler;
+pub struct Handler {
+    pub is_loop_running: AtomicBool,
+    pub kick_manager: Arc<Mutex<KickManager>>,
+}
 
 pub fn snowflake_as_db<T>(flake: T) -> i64
 where
@@ -46,6 +54,22 @@ impl EventHandler for Handler {
 
         // Create global slash commands
         commands::setup_commands(&ctx).await;
+    }
+
+    async fn cache_ready(&self, ctx: Context, _guilds: Vec<GuildId>) {
+        println!("Cache built successfully!");
+
+        if !self.is_loop_running.load(Ordering::Relaxed) {
+            let kick_manager = self.kick_manager.clone();
+            kick_manager.lock().await.provide_context(ctx.clone());
+            tokio::spawn(async move {
+                loop {
+                    Self::check_pending_kicks(&ctx, kick_manager.clone()).await;
+                    tokio::time::sleep(Duration::from_secs(30)).await;
+                }
+            });
+            self.is_loop_running.store(true, Ordering::Relaxed);
+        }
     }
 
     async fn interaction_create(&self, ctx: Context, interaction: Interaction) {
@@ -178,6 +202,34 @@ impl Handler {
         {
             error!("Error while sending greeting message to guild {guild:?}: {why}");
             return;
+        }
+    }
+
+    async fn check_pending_kicks(ctx: &Context, kick_manager: Arc<Mutex<KickManager>>) {
+        let type_map = ctx.data.read().await;
+        let pool_holder: &DatabasePoolHolder = type_map.get::<DatabasePoolHolder>().unwrap();
+        let pool = pool_holder.as_ref();
+
+        debug!("Performing check for pending kicks...");
+        let now_unix_time = std::time::UNIX_EPOCH
+            .elapsed()
+            .expect("Program run before UNIX epoch?!")
+            .as_secs() as i64;
+        match sqlx::query!(
+            "SELECT * FROM pending_kicks WHERE kick_after_unix_time>?",
+            now_unix_time
+        )
+        .fetch_all(pool)
+        .await
+        {
+            Err(why) => error!("Error while fetching pending kicks: {why}"),
+            Ok(data) => {
+                let mut kick_manager = kick_manager.lock().await;
+                for item in data {
+                    kick_manager.provide_context(ctx.clone());
+                    kick_manager.submit_kick(item.id).await;
+                }
+            }
         }
     }
 }

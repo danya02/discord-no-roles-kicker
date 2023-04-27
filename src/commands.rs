@@ -101,7 +101,9 @@ pub async fn dispatch(ctx: Context, command: ApplicationCommandInteraction) {
         "syschannel" => channel::system_run(&ctx, &command).await,
         "pendingchannel" => channel::notify_run(&ctx, &command).await,
         "newtimeout" => timeout::run(&ctx, &command, timeout::TimeoutType::NewMember).await,
-        "immunitytimeout" => timeout::run(&ctx, &command, timeout::TimeoutType::ImmunityRoleLoss).await,
+        "immunitytimeout" => {
+            timeout::run(&ctx, &command, timeout::TimeoutType::ImmunityRoleLoss).await
+        }
         "safetytimeout" => timeout::run(&ctx, &command, timeout::TimeoutType::Safety).await,
 
         other => {

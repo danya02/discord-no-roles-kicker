@@ -21,11 +21,11 @@ pub fn new_register(command: &mut CreateApplicationCommand) -> &mut CreateApplic
                 .required(false)
                 .kind(serenity::model::prelude::command::CommandOptionType::Integer)
                 .min_int_value(0)
-                // Choices make it mandatory to choose one of a list, which we don't want
-                // .add_int_choice("1 day", 86400)
-                // .add_int_choice("7 days", 86400 * 7)
-                // .add_int_choice("14 days", 86400 * 14)
-                // .add_int_choice("31 days", 31 * 86400)
+            // Choices make it mandatory to choose one of a list, which we don't want
+            // .add_int_choice("1 day", 86400)
+            // .add_int_choice("7 days", 86400 * 7)
+            // .add_int_choice("14 days", 86400 * 14)
+            // .add_int_choice("31 days", 31 * 86400)
         })
 }
 
@@ -41,11 +41,11 @@ pub fn immunity_register(command: &mut CreateApplicationCommand) -> &mut CreateA
                 .required(false)
                 .kind(serenity::model::prelude::command::CommandOptionType::Integer)
                 .min_int_value(0)
-                // Choices make it mandatory to choose one of a list, which we don't want
-                // .add_int_choice("1 day", 86400)
-                // .add_int_choice("7 days", 86400 * 7)
-                // .add_int_choice("14 days", 86400 * 14)
-                // .add_int_choice("31 days", 31 * 86400)
+            // Choices make it mandatory to choose one of a list, which we don't want
+            // .add_int_choice("1 day", 86400)
+            // .add_int_choice("7 days", 86400 * 7)
+            // .add_int_choice("14 days", 86400 * 14)
+            // .add_int_choice("31 days", 31 * 86400)
         })
 }
 
@@ -61,11 +61,11 @@ pub fn safety_register(command: &mut CreateApplicationCommand) -> &mut CreateApp
                 .required(true)
                 .kind(serenity::model::prelude::command::CommandOptionType::Integer)
                 .min_int_value(30)
-                // Choices make it mandatory to choose one of a list, which we don't want
-                // .add_int_choice("2 minutes", 2 * 60)
-                // .add_int_choice("10 minutes", 10 * 60)
-                // .add_int_choice("30 minutes", 30 * 60)
-                // .add_int_choice("1 hour", 60 * 60)
+            // Choices make it mandatory to choose one of a list, which we don't want
+            // .add_int_choice("2 minutes", 2 * 60)
+            // .add_int_choice("10 minutes", 10 * 60)
+            // .add_int_choice("30 minutes", 30 * 60)
+            // .add_int_choice("1 hour", 60 * 60)
         })
 }
 

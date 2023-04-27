@@ -1,8 +1,14 @@
 mod commands;
 mod handler;
+mod kick_manager;
+mod perform_kick;
 
-use std::path::Path;
+use std::{
+    path::Path,
+    sync::{atomic::AtomicBool, Arc},
+};
 
+use kick_manager::KickManager;
 use serenity::{framework::StandardFramework, prelude::*};
 use sqlx::SqlitePool;
 
@@ -62,7 +68,10 @@ async fn main() {
         | GatewayIntents::GUILDS;
 
     let mut client = Client::builder(&token, intents)
-        .event_handler(handler::Handler)
+        .event_handler(handler::Handler {
+            is_loop_running: AtomicBool::new(false),
+            kick_manager: Arc::new(Mutex::new(KickManager::new())),
+        })
         .type_map_insert::<DatabasePoolHolder>(holder)
         .framework(StandardFramework::new())
         .await
