@@ -45,8 +45,13 @@ async def show_config(interaction: discord.Interaction):
     text += f'When kicking a member, allow cancelling within: {h} = {config.kick_safety_timeout} seconds `/safetytimeout`\n'
 
     text += 'To reset these settings to safe defaults, perform `/setup` again.'
-    interaction.response.send_message(text)
+    await interaction.response.send_message(text)
 
 
-show_config.name = 'showconfig'
-show_config.description = discord.utils.MISSING
+show_config = app_commands.Command(
+    name="showconfig",
+    description="Display the current configuration of this server.",
+    callback=show_config
+)
+show_config.default_permissions = discord.Permissions()
+show_config.default_permissions.kick_members = True

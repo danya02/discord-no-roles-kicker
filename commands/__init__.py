@@ -1,16 +1,9 @@
 import discord
 from . import show_rule
+from . import setup
 
-cmds = [show_rule.show_config]
+cmds = [show_rule.show_config, setup.setup]
 
 def attach(tree: discord.app_commands.CommandTree):
     for cmd in cmds:
-        name = discord.utils.MISSING
-        description = discord.utils.MISSING
-        try:
-            name = cmd.name
-        except AttributeError: pass
-        try:
-            description = cmd.description
-        except AttributeError: pass
-        tree.command(name=name, description=description)(cmd)
+        tree.add_command(cmd)

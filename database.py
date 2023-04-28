@@ -3,7 +3,7 @@ import logging
 log = logging.getLogger(__name__)
 
 
-db = pw.SqliteDatabase("/database.py")
+db = pw.SqliteDatabase("/database.db")
 
 def create_table(cls):
     log.debug("Creating table for", cls)
