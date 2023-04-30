@@ -29,7 +29,7 @@ async def on_member_join(client: discord.Client, member: discord.Member):
     msg += f"Member will be kicked after {dt.datetime.fromtimestamp(k.kick_after).ctime()} (UTC time)\n"
     if k.unless_has_role_id:
         msg += f"Member will not be kicked if they have role <@&{k.unless_has_role_id}>\n"
-    msg += "Review pending kicks with `/kicks`, or cancel kicks with `/cancel`."
+    msg += "Review pending kicks with `/kicks...`, or cancel kicks with `/cancel`."
     await syschan.send(msg, allowed_mentions=discord.AllowedMentions.none())
 
 
@@ -103,5 +103,5 @@ async def on_member_update(client: discord.Client, before: discord.Member, after
                 msg += f"Member will be kicked after {dt.datetime.fromtimestamp(k.kick_after).ctime()} (UTC time)\n"
                 if k.unless_has_role_id:
                     msg += f"Member will not be kicked if they have role <@&{k.unless_has_role_id}>\n"
-                msg += "Review pending kicks with `/kicks`, or cancel kicks with `/cancel`."
+                msg += "Review pending kicks with `/kicks...`, or cancel kicks with `/cancel`."
                 await syschan.send(msg, allowed_mentions=discord.AllowedMentions.none())
