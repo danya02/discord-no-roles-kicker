@@ -4,6 +4,7 @@ from . import setup
 from . import channel
 from . import timeout
 from . import manual_kick
+from . import reminder_values
 
 cmds = [
     show_rule.show_config,
@@ -11,6 +12,7 @@ cmds = [
     channel.syschannel, channel.pendingchannel,
     timeout.newtimeout, timeout.immunitytimeout, timeout.safetytimeout,
     manual_kick.add_manual_kick,
+    reminder_values.pendingreminders,
     ]
 
 def attach(tree: discord.app_commands.CommandTree):

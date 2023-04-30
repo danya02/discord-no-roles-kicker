@@ -36,4 +36,4 @@ class ScheduledKick(MyModel):
     kick_after = pw.BigIntegerField(index=True)
     unless_has_role_id = pw.BigIntegerField(null=True, index=True)
 
-    last_reminder_time = pw.IntegerField(index=True)
+    last_reminder_time = pw.IntegerField(index=True, null=True)

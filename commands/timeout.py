@@ -94,7 +94,7 @@ async def autocomplete_short(interaction: discord.Interaction,
 
 @app_commands.autocomplete(timeout=autocomplete_short)
 @app_commands.guild_only()
-async def safetytimeout(interaction: discord.Interaction, timeout: Optional[int]):
+async def safetytimeout(interaction: discord.Interaction, timeout: int):
     """Set the kick safety timeout, in seconds."""
     guild_id = interaction.guild_id
     try:

@@ -60,7 +60,7 @@ async def hello(interaction: discord.Interaction):
     await interaction.response.send_message(f'Hi, {interaction.user.mention}')
 
 def main():
-    discord.utils.setup_logging(level=logging.INFO)
+    discord.utils.setup_logging(level=logging.DEBUG)
     client.run(os.getenv("DISCORD_TOKEN"), log_handler=None)
 
 if __name__ == '__main__':
