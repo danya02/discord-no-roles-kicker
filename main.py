@@ -1,8 +1,10 @@
 import discord
 from discord import app_commands
+from discord.ext import tasks
 import os
-import database
 import logging
+import kicking
+import peewee as pw
 log = logging.getLogger(__name__)
 
 import commands
@@ -17,6 +19,7 @@ class MyClient(discord.Client):
         intents.members = True
         super().__init__(intents=intents)
         self.tree = app_commands.CommandTree(self)
+        self.check_for_pending_kicks.add_exception_type(pw.PeeweeException)
 
     async def setup_hook(self):
         commands.attach(self.tree)
@@ -24,6 +27,13 @@ class MyClient(discord.Client):
             self.tree.copy_global_to(guild=GUILD)
             await self.tree.sync(guild=GUILD)
         await self.tree.sync()
+        self.check_for_pending_kicks.start()
+
+    
+    @tasks.loop(seconds=30)
+    async def check_for_pending_kicks(self):
+        await kicking.kick_check_loop.check_for_pending_kicks(self)
+
 
 
 
@@ -40,7 +50,7 @@ async def hello(interaction: discord.Interaction):
     await interaction.response.send_message(f'Hi, {interaction.user.mention}')
 
 def main():
-    discord.utils.setup_logging()
+    discord.utils.setup_logging(level=logging.INFO)
     client.run(os.getenv("DISCORD_TOKEN"), log_handler=None)
 
 if __name__ == '__main__':

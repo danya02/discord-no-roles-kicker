@@ -7,6 +7,8 @@ COPY requirements.txt .
 RUN pip3 install --no-cache -r ./requirements.txt
 
 RUN mkdir commands
+RUN mkdir kicking
 COPY main.py .
 COPY database.py .
 COPY commands/* ./commands
+COPY kicking/* ./kicking

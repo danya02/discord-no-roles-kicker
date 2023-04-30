@@ -20,7 +20,7 @@ class ManualKickTimeoutSet(discord.ui.Modal, title="When to kick?"):
         k = ScheduledKick(
             guild_id=interaction.guild_id,
             user_id = self.member.id,
-            kick_after = dt.datetime.now() + dt.timedelta(seconds=timeout),
+            kick_after = (dt.datetime.now() + dt.timedelta(seconds=timeout)).timestamp(),
             unless_has_role_id=self.config.immunity_role_id
         )
 
