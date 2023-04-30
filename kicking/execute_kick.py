@@ -139,7 +139,7 @@ async def run_kick(client: discord.Client, kick: ScheduledKick):
         return
     
     for role in member.roles:
-        if role.id == kick.unless_has_role_id:
+        if role.id == kick.unless_has_role_id or role.id == config.immunity_role_id:
             kick.is_active = False
             kick.save()
             await msg.edit(content=f"Pending kick for {member} {member.mention} was cancelled because they gained role <@&{role.id}>")

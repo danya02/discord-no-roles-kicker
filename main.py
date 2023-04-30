@@ -34,14 +34,24 @@ class MyClient(discord.Client):
     async def check_for_pending_kicks(self):
         await kicking.kick_check_loop.check_for_pending_kicks(self)
 
-
-
-
 client = MyClient()
 
 @client.event
 async def on_ready():
     log.info(f'Logged in as {client.user} (ID: {client.user.id})')
+
+
+@client.event
+async def on_member_join(member):
+    await kicking.scheduling.on_member_join(client, member)
+
+@client.event
+async def on_raw_member_remove(payload):
+    await kicking.scheduling.on_raw_member_remove(client, payload)
+
+@client.event
+async def on_member_update(before, after):
+    await kicking.scheduling.on_member_update(client, before, after)
 
 
 @client.tree.command()

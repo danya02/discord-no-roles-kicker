@@ -35,3 +35,5 @@ class ScheduledKick(MyModel):
     guild_id = pw.BigIntegerField()
     kick_after = pw.BigIntegerField(index=True)
     unless_has_role_id = pw.BigIntegerField(null=True, index=True)
+
+    last_reminder_time = pw.IntegerField(index=True)
