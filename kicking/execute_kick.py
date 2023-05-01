@@ -77,7 +77,7 @@ async def run_kick(client: discord.Client, kick: ScheduledKick):
             else:
                 progress_bar += '⬜' # WHITE LARGE SQUARE
         
-        msg = f"Currently kicking: {member} {member.mention}\n"
+        msg = f"Currently executing kick ID: {kick.id}, kicking: {member} {member.mention}\n"
         msg += f"Kick will happen in: {int(time_remaining.total_seconds())} seconds = {humanize.precisedelta(time_remaining)}\n"
         if kick.unless_has_role_id:
             msg += f"Cancel this kick by giving the member the role <@&{kick.unless_has_role_id}>, or clicking the reaction button on this message.\n"
@@ -96,6 +96,13 @@ async def run_kick(client: discord.Client, kick: ScheduledKick):
     await msg.add_reaction('🚫') # NO ENTRY SIGN
 
     while dt.datetime.now() < final_time:
+        config = GuildConfig.get(GuildConfig.guild_id == guild_id)  # Refresh guild config
+        kick = ScheduledKick.get_by_id(kick.id)
+
+        if kick.is_active == False:
+            await msg.edit(content=f"Pending kick ID: {kick.id} for {member} {member.mention} was cancelled by some external event")
+            return
+
         # Loop until the final time has passed
         try:
             reaction, user = await client.wait_for('reaction_add', timeout=30, check=lambda reaction, user: reaction.message == msg)
@@ -103,7 +110,7 @@ async def run_kick(client: discord.Client, kick: ScheduledKick):
                 # Cancel the kick
                 kick.is_active = False
                 kick.save()
-                await msg.edit(content=f"Pending kick for {member} {member.mention} was cancelled by {user} via reaction")
+                await msg.edit(content=f"Pending kick ID: {kick.id} for {member} {member.mention} was cancelled by {user} via reaction")
                 return
             else:
                 await syschan.send(f"Sorry {user.mention}, you cannot cancel the pending kick because you do not have permission to \"Kick Members\" in this server.", delete_after=10)
@@ -113,7 +120,7 @@ async def run_kick(client: discord.Client, kick: ScheduledKick):
         await msg.edit(content=make_message())
 
         # If there is an immunity role provided for the kick, check if the member has gained it.
-        if kick.unless_has_role_id:
+        if kick.unless_has_role_id or config.immunity_role_id:
             try:
                 member = await guild.fetch_member(kick.user_id)  # fetch for newest info
             except discord.NotFound:
@@ -130,6 +137,8 @@ async def run_kick(client: discord.Client, kick: ScheduledKick):
                     return
 
     # Timeout expired: time for final check and kick
+    config = GuildConfig.get(GuildConfig.guild_id == guild_id)  # Refresh guild config
+    kick = ScheduledKick.get_by_id(kick.id)
     try:
         member = await guild.fetch_member(kick.user_id)  # fetch for newest info
     except discord.NotFound:

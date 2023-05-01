@@ -7,6 +7,7 @@ from . import manual_kick
 from . import reminder_values
 from . import cancel
 from . import kick_list
+from . import role
 
 cmds = [
     show_rule.show_config,
@@ -17,6 +18,7 @@ cmds = [
     reminder_values.pendingreminders,
     cancel.cancel,
     kick_list.all_kicks, kick_list.pending_kicks,
+    role.immunityrole,
     ]
 
 def attach(tree: discord.app_commands.CommandTree):

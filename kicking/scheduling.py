@@ -82,10 +82,11 @@ async def on_member_update(client: discord.Client, before: discord.Member, after
         for k in ScheduledKick.select()\
             .where(ScheduledKick.guild_id == before.guild.id)\
             .where(ScheduledKick.user_id == before.id)\
-            .where(ScheduledKick.unless_has_role_id == role.id):
+            .where(ScheduledKick.unless_has_role_id == role.id)\
+            .where(ScheduledKick.is_active == True):
             k.is_active = False
             k.save()
-        await syschan.send(f"Pending kick ID: {k.id} cancelled because the member it concerned, {before.user} {before.user.mention} (ID: {before.user.id}), gained role <@&{role.id}>.", allowed_mentions=discord.AllowedMentions.none())
+            await syschan.send(f"Pending kick ID: {k.id} cancelled because the member it concerned, {before} {before.mention} (ID: {before.id}), gained role <@&{role.id}>.", allowed_mentions=discord.AllowedMentions.none())
 
     # If removed a role, check if it is the immunity role
     # (but only if loss_of_immunity_role_timeout is set)

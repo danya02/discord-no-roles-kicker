@@ -20,6 +20,7 @@ class MyClient(discord.Client):
         super().__init__(intents=intents)
         self.tree = app_commands.CommandTree(self)
         self.check_for_pending_kicks.add_exception_type(pw.PeeweeException)
+        self.run_reminders.add_exception_type(pw.PeeweeException)
 
     async def setup_hook(self):
         commands.attach(self.tree)
@@ -28,11 +29,16 @@ class MyClient(discord.Client):
             await self.tree.sync(guild=GUILD)
         await self.tree.sync()
         self.check_for_pending_kicks.start()
+        self.run_reminders.start()
 
     
     @tasks.loop(seconds=30)
     async def check_for_pending_kicks(self):
         await kicking.kick_check_loop.check_for_pending_kicks(self)
+
+    @tasks.loop(seconds=29.5)  # slight offset to allow drift, so that database load isn't all at the same time
+    async def run_reminders(self):
+        await kicking.reminders.run_reminders(self)
 
 client = MyClient()
 
