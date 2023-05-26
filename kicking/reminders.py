@@ -14,8 +14,8 @@ def get_kick_msg_text(kick: ScheduledKick, gconf: GuildConfig) -> str:
         gconf.pending_kick_notification_msg = KICK_MSG_TEXT_DEFAULT
         # Deliberately do not save this.
     return gconf.pending_kick_notification_msg\
-        .replace("{who}", "<@{kick.user_id}>")\
-        .replace("{when}", {humanize.naturaldelta(seconds_remaining, minimum_unit='seconds')})
+        .replace("{who}", f"<@{kick.user_id}>")\
+        .replace("{when}", humanize.naturaldelta(seconds_remaining, minimum_unit='seconds'))
 
 
 async def run_reminders(client: discord.Client):

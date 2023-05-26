@@ -65,7 +65,7 @@ class PendingKickMsgSet(discord.ui.Modal, title="Kick reminder message"):
         config.save()
 
         test_kick = ScheduledKick()
-        test_kick.user_id = interaction.user.id
+        test_kick.user_id = int(interaction.user.id)
         test_kick.kick_after = dt.datetime.now() + dt.timedelta(days=1337, seconds=420)
         test_kick.kick_after = int(test_kick.kick_after.timestamp())
 
