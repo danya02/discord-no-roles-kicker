@@ -5,7 +5,7 @@ import logging
 import humanize
 log = logging.getLogger(__name__)
 
-KICK_MSG_TEXT_DEFAULT = "f{who} will be kicked in {when}. Please contact a server moderator for more information."
+KICK_MSG_TEXT_DEFAULT = "{who} will be kicked in {when}. Please contact a server moderator for more information."
 KICK_MSG_AVAILABLE_REPLACEMENTS = ['who', 'when']
 
 def get_kick_msg_text(kick: ScheduledKick, gconf: GuildConfig) -> str:

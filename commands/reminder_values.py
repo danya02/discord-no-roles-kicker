@@ -86,7 +86,7 @@ async def pendingmsg(interaction: discord.Interaction):
 
     modal = PendingKickMsgSet()
     modal.label.default = "You are about to change the message that gets sent to remind members of pending kicks. Use the provided placeholders to show where to put information. Empty to reset to default message. Afterwards, an example reminder will be shown."
-    modal.label2.default = "; ".join(KICK_MSG_AVAILABLE_REPLACEMENTS)
+    modal.label2.default = "; ".join(['{'+i+'}' for i in  KICK_MSG_AVAILABLE_REPLACEMENTS])
     modal.msg.default = config.pending_kick_notification_msg or KICK_MSG_TEXT_DEFAULT
     await interaction.response.send_modal(modal)
 
