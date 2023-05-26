@@ -5,6 +5,19 @@ import logging
 import humanize
 log = logging.getLogger(__name__)
 
+KICK_MSG_TEXT_DEFAULT = "f{who} will be kicked in {when}. Please contact a server moderator for more information."
+KICK_MSG_AVAILABLE_REPLACEMENTS = ['who', 'when']
+
+def get_kick_msg_text(kick: ScheduledKick, gconf: GuildConfig) -> str:
+    seconds_remaining = int((dt.datetime.now() - dt.datetime.fromtimestamp(kick.kick_after)).total_seconds())
+    if not gconf.pending_kick_notification_msg:
+        gconf.pending_kick_notification_msg = KICK_MSG_TEXT_DEFAULT
+        # Deliberately do not save this.
+    return gconf.pending_kick_notification_msg\
+        .replace("{who}", "<@{kick.user_id}>")\
+        .replace("{when}", {humanize.naturaldelta(seconds_remaining, minimum_unit='seconds')})
+
+
 async def run_reminders(client: discord.Client):
     # Run only for guilds that have a reminder channel set.
     # In those, select kicks that are active.
@@ -40,7 +53,7 @@ async def run_reminders(client: discord.Client):
         if smallest_threshold_exceeded >= (kick.last_reminder_time or float('inf')): continue
 
         try:
-            await notifychan.send(f"<@{kick.user_id}> will be kicked in {humanize.naturaldelta(seconds_remaining, minimum_unit='seconds')}. Please contact a server moderator for more information.", allowed_mentions=discord.AllowedMentions(users=True, roles=False))
+            await notifychan.send(get_kick_msg_text(kick, gconf), allowed_mentions=discord.AllowedMentions(users=True, roles=False))
             kick.last_reminder_time = smallest_threshold_exceeded
             kick.save()
         except:

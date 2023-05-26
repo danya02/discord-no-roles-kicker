@@ -24,6 +24,7 @@ class GuildConfig(MyModel):
     pending_kick_notification_channel_id = pw.BigIntegerField(null=True)
     pending_kick_notification_values = pw.TextField(default='3600 7200 21600 43200 86400 259200 604800 1209600')
     kick_safety_timeout = pw.IntegerField(default=15*60)
+    pending_kick_notification_msg = pw.TextField(null=True)
 
 
 @create_table
