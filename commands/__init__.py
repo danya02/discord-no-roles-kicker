@@ -15,7 +15,7 @@ cmds = [
     channel.syschannel, channel.pendingchannel,
     timeout.newtimeout, timeout.immunitytimeout, timeout.safetytimeout,
     manual_kick.add_manual_kick,
-    reminder_values.pendingreminders,
+    reminder_values.pendingreminders, reminder_values.pendingmsg,
     cancel.cancel,
     kick_list.all_kicks, kick_list.pending_kicks,
     role.immunityrole,
