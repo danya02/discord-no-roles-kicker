@@ -40,12 +40,13 @@ async def run_reminders(client: discord.Client):
 
 
         # Now check whether we need to send the reminder.
-        seconds_remaining = int((dt.datetime.now() - dt.datetime.fromtimestamp(kick.kick_after)).total_seconds())
+        seconds_remaining = - int((dt.datetime.now() - dt.datetime.fromtimestamp(kick.kick_after)).total_seconds())
         smallest_threshold_exceeded = float('inf')
         for threshold in map(int, gconf.pending_kick_notification_values.split()):
             if threshold < seconds_remaining:
                 smallest_threshold_exceeded = threshold
         
+        #log.info(f'kick {kick} will happen in {seconds_remaining}, and passed threshold {smallest_threshold_exceeded}. last reminder was at {kick.last_reminder_time}')
         # If no thresholds have been hit, don't notify
         if smallest_threshold_exceeded == float('inf'): continue
 
